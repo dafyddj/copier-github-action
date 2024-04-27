@@ -1,0 +1,68 @@
+---
+name: Main
+on: [push, pull_request]
+
+jobs:
+  pre-commit:
+    name: Run `pre-commit`
+    runs-on: ubuntu-latest
+    env:
+      # renovate: datasource=github-tags depName=python/cpython
+      PYTHON_VERSION: 3.12.3
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+  gv:
+    name: Get value
+    runs-on: ubuntu-latest
+    outputs:
+      value: ${{ steps.get-value.outputs.value }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - id: get-value
+        name: Run this action
+        uses: ./
+      - run: |
+          echo "::notice ::Value: ${{ steps.get-value.outputs.value }}"
+  show-value:
+    name: Show value
+    needs: gv
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::notice ::Value: $VALUE"
+        env:
+          VALUE: ${{ fromJSON(needs.gv.outputs.value) }}
+  release:
+    name: Release
+    needs:
+      - pre-commit
+      - show-value
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Run `semantic-release`
+        uses: codfish/semantic-release-action@b0e57c976bf8f74b2454f59a30e4a1b5f11727b4 # v3.3.0
+        id: sem-rel
+        with:
+          plugins: |
+            [ "@semantic-release/commit-analyzer",
+              "@semantic-release/release-notes-generator",
+              "@semantic-release/github"
+            ]
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update branch for major version
+        if: steps.sem-rel.outputs.new-release-published == 'true'
+        run: git push
+             https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+             HEAD:refs/heads/v${{steps.sem-rel.outputs.release-major}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
