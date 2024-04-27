@@ -1,0 +1,17 @@
+---
+name: Example
+author: dafyddj
+description: An example composite action
+outputs:
+  value:
+    description: A basic output
+    value: ${{ steps.get-value.outputs.value }}
+runs:
+  using: composite
+  steps:
+    - id: get-value
+      shell: bash
+      run: |
+        OUTPUT="value=true"
+        echo "Setting '$OUTPUT'"
+        echo "$OUTPUT" >> $GITHUB_OUTPUT
