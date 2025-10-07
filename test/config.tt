@@ -15,6 +15,8 @@ main_yml:.github/workflows/main.yml
 pre-commit_yaml:.pre-commit-config.yaml
 
 [run_dependent_text]
+main_yml:(-? uses: [\w-]+\/[.\w-]+)@.+${REPLACE \1@version}
+pre-commit_yaml:(rev:) \S+{REPLACE \1 version}
 stderr:Copying from template version
 stderr:DirtyLocalWarning{LINES 2}
 stderr:No git tags found in template; using HEAD as ref
