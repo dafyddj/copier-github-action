@@ -1,7 +1,13 @@
 {
-  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [
     'github>techneg-it/.github',
-    'github>techneg-it/.github:copier',
+    'github>techneg-it/.github:check-jsonschema',
+    'github>techneg-it/.github:copier-new',
+    'github>techneg-it/.github:github-actions',
+    'github>techneg-it/.github:pre-commit',
+    'github>techneg-it/.github:python-versions',
+    'github>techneg-it/.github:weekly',
+    ':automergeStableNonMajor',
   ],
 }
