@@ -15,6 +15,7 @@ main_yml:.github/workflows/main.yml
 pre-commit_yaml:.pre-commit-config.yaml
 
 [run_dependent_text]
+main_yml:([A-Za-z0-9_]+?_VERSION:) \S+{REPLACE \1 version}
 main_yml:(-? uses: [\w-]+\/[.\w-]+)@.+${REPLACE \1@version}
 pre-commit_yaml:(rev:) \S+{REPLACE \1 version}
 stderr:Copying from template version
