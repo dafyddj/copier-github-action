@@ -13,6 +13,7 @@ create_catalogues:true
 action_yml:action.yml
 main_yml:.github/workflows/main.yml
 pre-commit_yaml:.pre-commit-config.yaml
+renovate_json5:.github/renovate.json5
 
 [run_dependent_text]
 main_yml:([A-Za-z0-9_]+?_VERSION:) \S+{REPLACE \1 version}
